@@ -3,7 +3,7 @@ import json
 import datetime
 from pathlib import Path
 
-st.title("🌍 My Travel Journal")
+st.title("My interactive CV")
 
 with open("data.json", "r") as f:
     entries = json.load(f)
