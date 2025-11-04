@@ -11,7 +11,7 @@ if 'unlocked' not in st.session_state:
 # ------------- Flappy Bird Unlock Interface
 if not st.session_state.unlocked:
     st.title("🔒 Unlock My CV")
-    st.write("Score 3 points in Flappy Bird to unlock! Press SPACE or ↑ to jump.")
+    st.write("Score 3 points in Flappy Bird to unlock! Click or press SPACE/↑ to jump.")
     
     # Create a checkbox that will be toggled by JavaScript
     unlock_checkbox = st.checkbox("Unlocked", value=False, key="unlock_check", label_visibility="hidden")
@@ -39,6 +39,7 @@ if not st.session_state.unlocked:
             #board {
                 background-color: #70c5ce;
                 box-shadow: 0 0 20px rgba(0,0,0,0.3);
+                cursor: pointer;
             }
             #victory-message {
                 display: none;
@@ -104,6 +105,17 @@ if not st.session_state.unlocked:
                 requestAnimationFrame(update);
                 setInterval(placePipes, 1500);
                 document.addEventListener("keydown", moveBird);
+                
+                // Add click event listener to the canvas
+                board.addEventListener("click", function() {
+                    jump();
+                });
+                
+                // Add touch event listener for mobile
+                board.addEventListener("touchstart", function(e) {
+                    e.preventDefault();
+                    jump();
+                });
             }
 
             function drawBird() {
@@ -199,7 +211,7 @@ if not st.session_state.unlocked:
                     context.font="35px sans-serif";
                     context.fillText("GAME OVER", 50, boardHeight/2);
                     context.font="20px sans-serif";
-                    context.fillText("Press SPACE to restart", 60, boardHeight/2 + 40);
+                    context.fillText("Click to restart", 80, boardHeight/2 + 40);
                 }
             }
 
@@ -232,19 +244,23 @@ if not st.session_state.unlocked:
                 pipeArray.push(bottomPipe);
             }
 
+            function jump() {
+                //jump
+                velocityY = -6;
+
+                //reset game
+                if (gameOver && score < 3) {
+                    bird.y = birdY;
+                    pipeArray = [];
+                    score = 0;
+                    gameOver = false;
+                    messageSent = false;
+                }
+            }
+
             function moveBird(e) {
                 if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
-                    //jump
-                    velocityY = -6;
-
-                    //reset game
-                    if (gameOver && score < 3) {
-                        bird.y = birdY;
-                        pipeArray = [];
-                        score = 0;
-                        gameOver = false;
-                        messageSent = false;
-                    }
+                    jump();
                 }
             }
 
@@ -261,7 +277,7 @@ if not st.session_state.unlocked:
     
     components.html(flappy_html, height=750)
     
-    # button fallback
+    # Button fallback
     st.write("---")
     if st.button("🔓 Skip Game (Fallback)"):
         st.session_state.unlocked = True
@@ -272,7 +288,7 @@ if not st.session_state.unlocked:
 # ------------- CV content (shown after unlock)
 st.title("✨ My Interactive CV")
 
-#load data.json file
+# Load data.json file
 try:
     with open("data.json", "r") as f:
         entries = json.load(f)
@@ -280,7 +296,7 @@ except FileNotFoundError:
     st.error("data.json file not found!")
     st.stop()
 
-#parse available dates
+# Parse available dates
 all_dates = []
 for k in entries:
     try:
@@ -299,7 +315,7 @@ if not all_dates:
     st.warning("No valid entries found in data.json.")
     st.stop()
 
-#slider
+# Slider
 date = st.select_slider(
     "📅 Pick a date",
     options=all_dates,
@@ -326,7 +342,7 @@ if date_str and date_str in entries:
 else:
     st.info("Nothing recorded for this date.")
 
-# button at the bottom
+# Reset button at the bottom
 st.write("---")
 if st.button("🔒 Lock CV"):
     st.session_state.unlocked = False
