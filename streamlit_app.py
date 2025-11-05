@@ -189,16 +189,23 @@ if st.session_state.version_selected == 'fun':
                             
                             if (score >= 3 && !messageSent) {
                                 messageSent = true;
-                                gameOver = true;
                                 
                                 // Hide the game canvas
                                 board.style.display = 'none';
-                                
+                            }
+                        }
+
+                        if (detectCollision(bird, pipe)) {
+                            // only unlock CV when player has score >= 3 AND collides
+                            if (messageSent == true) {
+                                gameOver = true; // stop movement for a moment
+                                messageSent = true;
+
                                 // Show victory message
                                 let victoryDiv = document.getElementById('victory-message');
                                 victoryDiv.innerHTML = '<h1>🎉 YOU WIN! 🎉</h1><p>Unlocking CV...</p>';
                                 victoryDiv.style.display = 'block';
-                                
+
                                 // Unlock the CV
                                 setTimeout(() => {
                                     try {
@@ -210,12 +217,12 @@ if st.session_state.version_selected == 'fun':
                                         console.log('Could not access parent checkbox:', e);
                                     }
                                 }, 1500);
+                            } else {
+                                // Regular game over if score < 3
+                                gameOver = true;
                             }
                         }
 
-                        if (detectCollision(bird, pipe)) {
-                            gameOver = true;
-                        }
                     }
 
                     //clear pipes
