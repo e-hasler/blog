@@ -190,14 +190,17 @@ if st.session_state.version_selected == 'fun':
                             if (score >= 3 && !messageSent) {
                                 messageSent = true;
                                 
-                                // Hide the game canvas
-                                board.style.display = 'none';
                             }
                         }
 
                         if (detectCollision(bird, pipe)) {
+                            
+
                             // only unlock CV when player has score >= 3 AND collides
                             if (messageSent == true) {
+                                // Hide the game canvas
+                                board.style.display = 'none';
+
                                 gameOver = true; // stop movement for a moment
                                 messageSent = true;
 
